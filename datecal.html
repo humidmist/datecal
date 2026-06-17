@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date & Age Calculator (Soothing Glass)</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #141e1b 0%, #11161b 100%);
+            --glass-bg: rgba(30, 41, 36, 0.45);
+            --glass-inner: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            
+            --accent-color: #83c5be; 
+            --accent-hover: #9dd4cf;
+            --accent-dim: rgba(131, 197, 190, 0.15);
+            
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --error-color: #e07a5f;
+            --error-bg: rgba(224, 122, 95, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 32px 0 rgba(0, 0, 0, 0.37);
+            width: 100%;
+            max-width: 480px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 4px;
+            font-weight: 500;
+            letter-spacing: 0.8px;
+        }
+
+        .credit-line {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            opacity: 0.85;
+        }
+
+        .credit-line span {
+            color: var(--accent-color);
+            text-shadow: 0 0 8px var(--accent-dim);
+            font-weight: 500;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            background-color: var(--glass-inner);
+        }
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 18px;
+            color: var(--text-primary);
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+
+        .row-wrapper {
+            margin-bottom: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-group label {
+            width: 95px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .date-inputs, .duration-inputs {
+            display: flex;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        input[type="text"], input[type="number"], select {
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-primary);
+            border: 1px solid var(--border-glass);
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 0.95rem;
+            text-align: center;
+            outline: none;
+            box-sizing: border-box;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
+            border-color: var(--accent-color);
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+
+        .day-input, .month-input { flex: 1; min-width: 45px; }
+        .year-input { flex: 1.5; min-width: 65px; }
+        .duration-inputs input { flex: 1; min-width: 50px; }
+        
+        select {
+            flex-grow: 1;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        select option {
+            background-color: #1a221f;
+            color: var(--text-primary);
+        }
+
+        .live-preview {
+            font-size: 0.8rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            opacity: 0.6;
+            margin-left: 107px; 
+            margin-top: 6px;
+            min-height: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: #121c19;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+            box-shadow: 0 0 12px var(--accent-dim);
+        }
+
+        button:active {
+            transform: scale(0.99);
+        }
+
+        .result {
+            margin-top: 16px;
+            padding: 14px;
+            background-color: rgba(0, 0, 0, 0.15);
+            border-left: 3px solid var(--accent-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            white-space: pre-line;
+        }
+
+        .error {
+            color: var(--error-color);
+            background-color: var(--error-bg);
+            border-left-color: var(--error-color);
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        @media (max-width: 440px) {
+            .input-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+            .input-group label {
+                width: 100%;
+                margin-bottom: 2px;
+            }
+            .date-inputs, .duration-inputs, select {
+                width: 100%;
+            }
+            .live-preview {
+                margin-left: 0;
+                margin-top: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Date & Age Calculator</h2>
+    <div class="credit-line">created by <span>humidmist</span> and <span>Google Gemini</span></div>
+
+    <div class="section">
+        <h3>1. Calculate Difference / Age</h3>
+        
+        <div class="row-wrapper">
+            <div class="input-group">
+                <label>Start Date:</label>
+                <div class="date-inputs">
+                    <input type="text" id="d1" class="day-input" placeholder="DD" maxlength="2" oninput="updateLivePreview('d1','m1','y1','preview1')">
+                    <input type="text" id="m1" class="month-input" placeholder="MM" maxlength="2" oninput="updateLivePreview('d1','m1','y1','preview1')">
+                    <input type="text" id="y1" class="year-input" placeholder="YYYY" maxlength="4" oninput="updateLivePreview('d1','m1','y1','preview1')">
+                </div>
+            </div>
+            <div class="live-preview" id="preview1"></div>
+        </div>
+
+        <div class="row-wrapper">
+            <div class="input-group">
+                <label>End Date:</label>
+                <div class="date-inputs">
+                    <input type="text" id="d2" class="day-input" placeholder="DD" maxlength="2" oninput="updateLivePreview('d2','m2','y2','preview2')">
+                    <input type="text" id="m2" class="month-input" placeholder="MM" maxlength="2" oninput="updateLivePreview('d2','m2','y2','preview2')">
+                    <input type="text" id="y2" class="year-input" placeholder="YYYY" maxlength="4" oninput="updateLivePreview('d2','m2','y2','preview2')">
+                </div>
+            </div>
+            <div class="live-preview" id="preview2"></div>
+        </div>
+        
+        <button onclick="calculateDifference()">Calculate Difference</button>
+        <div class="result" id="diffResult">Result will appear here...</div>
+    </div>
+
+    <div class="section">
+        <h3>2. Add or Subtract Duration</h3>
+        
+        <div class="row-wrapper">
+            <div class="input-group">
+                <label>Base Date:</label>
+                <div class="date-inputs">
+                    <input type="text" id="db" class="day-input" placeholder="DD" maxlength="2" oninput="updateLivePreview('db','mb','yb','previewB')">
+                    <input type="text" id="mb" class="month-input" placeholder="MM" maxlength="2" oninput="updateLivePreview('db','mb','yb','previewB')">
+                    <input type="text" id="yb" class="year-input" placeholder="YYYY" maxlength="4" oninput="updateLivePreview('db','mb','yb','previewB')">
+                </div>
+            </div>
+            <div class="live-preview" id="previewB"></div>
+        </div>
+
+        <div class="row-wrapper">
+            <div class="input-group">
+                <label>Operation:</label>
+                <select id="operation">
+                    <option value="add">Add (+)</option>
+                    <option value="subtract">Subtract (-)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row-wrapper">
+            <div class="input-group">
+                <label>Duration:</label>
+                <div class="duration-inputs">
+                    <input type="number" id="durY" placeholder="Yrs" min="0">
+                    <input type="number" id="durM" placeholder="Mths" min="0">
+                    <input type="number" id="durD" placeholder="Days" min="0">
+                </div>
+            </div>
+        </div>
+
+        <button onclick="shiftDate()">Determine Date</button>
+        <div class="result" id="shiftResult">Result will appear here...</div>
+    </div>
+</div>
+
+<script>
+    function getOrdinalSuffix(day) {
+        if (day > 3 && day < 21) return 'th';
+        switch (day % 10) {
+            case 1:  return "st";
+            case 2:  return "nd";
+            case 3:  return "rd";
+            default: return "th";
+        }
+    }
+
+    function parseManualDate(dId, mId, yId) {
+        const d = parseInt(document.getElementById(dId).value, 10);
+        const m = parseInt(document.getElementById(mId).value, 10);
+        const y = parseInt(document.getElementById(yId).value, 10);
+
+        if (isNaN(d) || isNaN(m) || isNaN(y)) {
+            throw new Error("Please fill in all fields (DD, MM, YYYY).");
+        }
+        if (m < 1 || m > 12) {
+            throw new Error("Month must be between 01 and 12.");
+        }
+        if (d < 1 || d > 31) {
+            throw new Error("Day must be between 01 and 31.");
+        }
+
+        const dateObj = new Date(y, m - 1, d);
+        
+        if (dateObj.getDate() !== d || dateObj.getMonth() !== (m - 1) || dateObj.getFullYear() !== y) {
+            throw new Error("Invalid date mapping.");
+        }
+
+        return dateObj;
+    }
+
+    function formatDateString(date) {
+        const day = date.getDate();
+        const suffix = getOrdinalSuffix(day);
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        
+        return `${day}${suffix} ${months[date.getMonth()]} ${date.getFullYear()} (${weekdays[date.getDay()]})`;
+    }
+
+    function updateLivePreview(dId, mId, yId, previewId) {
+        const targetDiv = document.getElementById(previewId);
+        try {
+            const parsed = parseManualDate(dId, mId, yId);
+            targetDiv.innerText = formatDateString(parsed);
+        } catch(e) {
+            targetDiv.innerText = ""; 
+        }
+    }
+
+    function calculateDifference() {
+        const resDiv = document.getElementById('diffResult');
+        resDiv.classList.remove('error');
+        
+        try {
+            let date1 = parseManualDate('d1', 'm1', 'y1');
+            let date2 = parseManualDate('d2', 'm2', 'y2');
+            
+            let inverted = false;
+            if (date1 > date2) {
+                const temp = date1;
+                date1 = date2;
+                date2 = temp;
+                inverted = true;
+            }
+
+            const totalMs = date2 - date1;
+            const totalDays = Math.floor(totalMs / (1000 * 60 * 60 * 24));
+
+            let yDiff = date2.getFullYear() - date1.getFullYear();
+            let mDiff = date2.getMonth() - date1.getMonth();
+            let dDiff = date2.getDate() - date1.getDate();
+
+            if (dDiff < 0) {
+                mDiff--;
+                const previousMonth = new Date(date2.getFullYear(), date2.getMonth(), 0);
+                dDiff += previousMonth.getDate();
+            }
+
+            if (mDiff < 0) {
+                yDiff--;
+                mDiff += 12;
+            }
+
+            let output = `Total Days: ${totalDays} days\n`;
+            output += `Breakdown: ${yDiff} years, ${mDiff} months, ${dDiff} days`;
+            if (inverted) {
+                output += `\n*(Note: End date was chronologically before Start date)*`;
+            }
+
+            resDiv.innerText = output;
+
+        } catch (err) {
+            resDiv.classList.add('error');
+            resDiv.innerText = err.message;
+        }
+    }
+
+    function shiftDate() {
+        const resDiv = document.getElementById('shiftResult');
+        resDiv.classList.remove('error');
+
+        try {
+            const baseDate = parseManualDate('db', 'mb', 'yb');
+            const op = document.getElementById('operation').value;
+            
+            const yrs = parseInt(document.getElementById('durY').value, 10) || 0;
+            const mths = parseInt(document.getElementById('durM').value, 10) || 0;
+            const days = parseInt(document.getElementById('durD').value, 10) || 0;
+
+            const sign = (op === 'add') ? 1 : -1;
+
+            const targetDate = new Date(baseDate);
+            targetDate.setFullYear(baseDate.getFullYear() + (yrs * sign));
+            targetDate.setMonth(baseDate.getMonth() + (mths * sign));
+            targetDate.setDate(baseDate.getDate() + (days * sign));
+
+            resDiv.innerText = `Target Date: ${formatDateString(targetDate)}`;
+
+        } catch (err) {
+            resDiv.classList.add('error');
+            resDiv.innerText = err.message;
+        }
+    }
+</script>
+
+</body>
+</html>
